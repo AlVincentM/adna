@@ -32,8 +32,11 @@ int main(int argc, char *argv[]) {
 
     generateArray(array, size);
 
-    mergeSort(array, 0, size - 1);
+	printf("Heap Sort\n");
+    // mergeSort(array, 0, size - 1);
     // insertionSort(array, size);
+    // quickSort(array, 0, n - 1);
+    heapSort(array, size);
     printArr(array, size);
     
     printf("%d\n", n);

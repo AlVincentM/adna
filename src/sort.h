@@ -1,7 +1,9 @@
 #include <time.h>
 
 
-// function prototypes
+/////////////////////////
+// Function prototypes //
+/////////////////////////
 
 void insertionSort(int arr[], int n);
 
@@ -20,7 +22,9 @@ void heapify(int arr[], int n, int i);
 void heapSort(int arr[], int n);
 
 
-// global variables
+//////////////////////
+// Global variables //
+//////////////////////
 
 clock_t start, end;
 double cpu_time_used;

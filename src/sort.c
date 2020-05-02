@@ -3,7 +3,16 @@
 #include <stdio.h>
 
 
-// Insertion Sort definition
+///////////////////////////////
+// Insertion Sort definition //
+///////////////////////////////
+
+/**
+ * [insertionSort description]
+ * @author Al Vincent
+ * @param  arr [description]
+ * @param  n   [description]
+ */
 void insertionSort(int arr[], int n) {
     int i, key, j;
 

@@ -8,6 +8,13 @@
 
 int main(int argc, char * argv[]) {
 
+	array = (int*)malloc(sizeof(int));
+
+	if (NULL == array) {
+		perror("Insufficient memory...\n");
+		return EXIT_FAILURE;
+	}
+
 	prompt();
 	usage();
 
@@ -35,6 +42,7 @@ int main(int argc, char * argv[]) {
 		// quit
 		if(strcmp(line, "quit\n") == 0) {
 			printf("Bye!\n");
+			free(array);
 			free(line);
 			exit(1);
 		}

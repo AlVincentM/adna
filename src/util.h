@@ -16,11 +16,16 @@ extern int *array;
 // utility function prototypes //
 /////////////////////////////////
 
-void prompt(void);
-void usage(void);
+extern void prompt(void);
 
-int getArgCount(char *string);
+extern void usage(void);
 
-void getArgVector(char *string, int *arg_c, char *arg_v[]);
+extern int getArgCount(char *string);
 
-void process_args(int arg_c, char *arg_v[]);
+extern void getArgVector(char *string, int *arg_c, char *arg_v[]);
+
+extern void process_args(int arg_c, char *arg_v[]);
+
+extern void generateArray(char option);
+
+extern void showArray();

@@ -1,41 +1,32 @@
 #include "sort.h"
-#include <time.h>
 #include <stdio.h>
-
-
-///////////////////////////////
-// Insertion Sort definition //
-///////////////////////////////
 
 /**
  * [insertionSort description]
  * @author Al Vincent
- * @param  arr [description]
- * @param  n   [description]
  */
-void insertionSort(int arr[], int n) {
+void insertionSort(void) {
     int i, key, j;
-
-    // start counting here
-    start = clock();
-
-    for(i = 1; i < n; i++) {
-        key = arr[i];
+    for (i = 1; i < n; i++) {
+        key = *(temp_array + i);
         j = i - 1;
 
-        while(j >= 0 && arr [j] > key) {
-            arr[j + 1] = arr[j];
+        while (j >= 0 && *(temp_array + j) > key) {
+            *(temp_array + (j + 1)) = *(temp_array + j);
             j = j - 1;
         }
-        arr[j + 1] = key;
+        *(temp_array + (j + 1)) = key;
     }
-
-    end = clock();
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 }
 
-// merge sort definition
-void merge(int arr[], int left, int middle, int right) {
+/**
+ * [merge description]
+ * @author Al Vincent
+ * @param  left   [description]
+ * @param  middle [description]
+ * @param  right  [description]
+ */
+void merge(int left, int middle, int right) {
     int i, j, k;
     int n1 = middle - left + 1;
     int n2 = right - middle;
@@ -44,12 +35,12 @@ void merge(int arr[], int left, int middle, int right) {
 
     for (i = 0; i < n1; i++)
     {
-        left_arr[i] = arr[left + i];
+        left_arr[i] = *(temp_array + (left + i));
     }
 
     for (j = 0; j < n2; j++)
     {
-        right_arr[j] = arr[middle + 1 + j];
+        right_arr[j] = *(temp_array + (middle + 1 + j));
     }
 
     i = 0;
@@ -59,11 +50,11 @@ void merge(int arr[], int left, int middle, int right) {
     while (i < n1 && j < n2) {
         if (left_arr[i] <= right_arr[j])
         {
-            arr[k] = left_arr[i];
+            *(temp_array + k) = left_arr[i];
             i++;
         }
         else {
-            arr[k] = right_arr[j];
+            *(temp_array + k) = right_arr[j];
             j++;
         }
 
@@ -71,30 +62,42 @@ void merge(int arr[], int left, int middle, int right) {
     }
 
     while(i < n1) {
-        arr[k] = left_arr[i];
+        *(temp_array + k) = left_arr[i];
         i++;
         k++;
     }
 
     while (j < n2) {
-        arr[k] = right_arr[j];
+        *(temp_array + k) = right_arr[j];
         j++;
         k++;
     }
 }
 
-void mergeSort(int arr[], int left, int right) {
+/**
+ * [mergeSort description]
+ * @author Al Vincent
+ * @param  left  [description]
+ * @param  right [description]
+ */
+void mergeSort(int left, int right) {
     if (left < right)
     {
         int middle =  left + (right - left) / 2;
 
-        mergeSort(arr, left, middle);
-        mergeSort(arr, middle + 1, right);
+        mergeSort(left, middle);
+        mergeSort(middle + 1, right);
 
-        merge(arr, left, middle, right);
+        merge(left, middle, right);
     }
 }
 
+/**
+ * [swap description]
+ * @author Al Vincent
+ * @param  a [description]
+ * @param  b [description]
+ */
 void swap(int * a, int * b){
     int temp = *a;
     *a = *b;

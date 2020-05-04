@@ -6,10 +6,14 @@
 
 
 #include "util.h"
+#include "sort.h"
 
 int n;
 int x;
 int *array;
+int *temp_array;
+clock_t start, end;
+double cpu_time_used;
 
 /**
  * prints banner "Quarantine"
@@ -68,37 +72,6 @@ void getArgVector(char *string, int *arg_c, char *arg_v[]) {
  */
 void process_args(int arg_c, char *arg_v[]) {
     int c;
-
-    // while(1) {
-
-    //     c = getopt(arg_c, arg_v, "hn:x:");
-
-    //     if(c == -1) {
-    //         optind = 0;
-    //         break;
-    //     }
-
-    //     switch(c) {
-    //                   // print help message
-    //         case 'h': usage();
-    //                   exit(0);
-    //                   break;
-
-    //                   // set N as array size
-    //         case 'n': n = atoi(optarg);
-    //                   break;
-
-    //                   // set X for option b
-    //         case 'x': x = atoi(optarg);
-    //                   break;
-
-    //                   // print error if no argument is provided
-    //         case ':': fprintf(stderr, "\n Error: -%c missing argument\n", optopt);
-    //                   usage();
-    //                   exit(1);
-    //                   break;
-    //     } 
-    // }
     
     while(1) {
 
@@ -110,12 +83,15 @@ void process_args(int arg_c, char *arg_v[]) {
         {"X",       required_argument,  NULL, 'x'},
         {"N",       required_argument,  NULL, 'n'},
         {"array",   required_argument,  NULL, 'a'},
+        {"sort-using",    required_argument,  NULL, 's'},
         {NULL,      0,                  NULL,   0}
       };
 
-      c = getopt_long(arg_c, arg_v, "x:n:a:h", long_options, &option_index);
+      c = getopt_long(arg_c, arg_v, "x:n:a:s:h", long_options, &option_index);
       
       if(c == -1) {
+
+        // reset optind = 0 every after parsing
         optind = 0;
         break;
       }
@@ -131,16 +107,47 @@ void process_args(int arg_c, char *arg_v[]) {
         case 'x': x = atoi(optarg);
                   break;
 
+                  // generates a random array
         case 'a': if (strcmp(optarg, "random") == 0 || strcmp(optarg, "random\n") == 0) {
                     generateArray('r');
                     showArray();
                   }
+
+                  // generates a sorted array
                   else if (strcmp(optarg, "sorted") == 0 || strcmp(optarg, "sorted\n") == 0) {
                     generateArray('s');
                     showArray();
                   }
+
+                  // print an error if provided other arguments
                   else {
-                    printf("[ERROR]: Invalid argument for --array\n");
+                    fprintf(stderr, "[ERROR]: Invalid argument for --array\n");
+                  }
+                  break;
+
+        case 's': if (strcmp(optarg, "insertionsort") == 0 || strcmp(optarg, "insertionsort\n") == 0) {
+                    copyArray();
+                    sortingTime(1);
+                  }
+
+                  else if (strcmp(optarg, "mergesort") == 0 || strcmp(optarg, "mergesort\n") == 0) {
+                    copyArray();
+                    sortingTime(2);
+                  }
+
+                  else if (strcmp(optarg, "quicksort") == 0 || strcmp(optarg, "quicksort\n") == 0) {
+                    // TODO: sort with quick sort
+                  }
+
+                  else if (strcmp(optarg, "heapsort") == 0 || strcmp(optarg, "heapsort\n") == 0) {
+                    // TODO: sort with heap sort
+                  }
+
+                  else {
+                    fprintf(stderr,
+                            "[ERRO]: Unrecognized params for -s/--sort-using\n"
+                            "Use sort -h for help\n\n"
+                            );
                   }
                   break;
 
@@ -178,14 +185,17 @@ void usage(void) {
  */
 void generateArray(char option) {
 
+  // allocate memory
   array = realloc(array, n * sizeof(int));
 
+  // return if reallocation is unsuccessful
   if(NULL == array) {
-    perror("Insufficient memory...\n");
+    fprintf(stderr, "[ERROR]: Array size not set or insufficient memory.\n");
     free(array);
-    exit(1);
+    return;
   }
 
+  // make array random if option is r
   if (option == 'r') {
 
     for (int i = 0; i < n; i++) {
@@ -193,6 +203,8 @@ void generateArray(char option) {
     }
     printf("Array generated!\n");
   }
+
+  // make array sorted if option is s
   else if (option == 's') {
     int num = 1;
     for(int i = 0; i < n; i++) {
@@ -207,10 +219,76 @@ void generateArray(char option) {
  * [showArray description]
  * @author Al Vincent
  */
-void showArray() {
+void showArray(void) {
 
+  // print array
   for (int i = 0; i < n; i++) {
     printf("%d ", *(array + i));
   }
   printf("\n");
+}
+
+/**
+ * [copyArray description]
+ * @author Al Vincent
+ */
+void copyArray(void) {
+
+  // realloc temp_array
+  temp_array = realloc(temp_array, n * sizeof(int));
+  if (NULL == temp_array) {
+    fprintf(stderr, "Reallocation failed. Maybe insufficient memory.\n");
+    free(temp_array);
+    return;
+  }
+
+  // copy
+  for (int i = 0; i < n; i++) {
+    *(temp_array + i) = *(array + i);
+  }
+}
+
+void sortingTime(int choice) {
+
+  switch(choice) {
+
+            // get T(N) for insertion sort
+    case 1: start = clock();
+            insertionSort();
+            end = clock();
+            cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+            printf("\nBEFORE:\n");
+            showArray();
+            printf("\n");
+            printf("AFTER:\n");
+            for (int i = 0; i < n; i++) {
+              printf("%d ", *(temp_array + i));
+            }
+            printf("\n\n");
+            printf( "------------------------------------\n"
+                    "Insertion Sort took %f seconds\n"
+                    "------------------------------------\n\n"
+                    , cpu_time_used);
+            break;
+
+            // get T(N) for merge sort
+    case 2: start = clock();
+            mergeSort(0, n - 1);
+            end = clock();
+            cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+            printf("\nBEFORE:\n");
+            showArray();
+            printf("\n");
+            printf("AFTER:\n");
+            for (int i = 0; i < n; i++) {
+              printf("%d ", *(temp_array + i));
+            }
+            printf("\n\n");
+            printf( "--------------------------------\n"
+                    "Merge Sort took %f seconds\n"
+                    "--------------------------------\n\n"
+                    , cpu_time_used);
+            break;
+
+  }
 }

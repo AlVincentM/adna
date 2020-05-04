@@ -1,30 +1,28 @@
+#ifndef SORT_H
+
 #include <time.h>
+
+#include "util.h"
+
+#endif
 
 
 /////////////////////////
 // Function prototypes //
 /////////////////////////
 
-void insertionSort(int arr[], int n);
+extern void insertionSort(void);
 
-void mergeSort(int arr[], int left, int right);
+extern void mergeSort(int left, int right);
 
-void quickSort(int arr[], int low, int high);
+extern void quickSort(int arr[], int low, int high);
 
-void merge(int arr[], int left, int middle, int right);
+extern void merge(int left, int middle, int right);
 
-void swap(int * a, int * b);
+extern void swap(int *a, int *b);
 
-int partition(int arr[], int low, int high);
+extern int partition(int arr[], int low, int high);
 
-void heapify(int arr[], int n, int i);
+extern void heapify(int arr[], int n, int i);
 
-void heapSort(int arr[], int n);
-
-
-//////////////////////
-// Global variables //
-//////////////////////
-
-clock_t start, end;
-double cpu_time_used;
+extern void heapSort(int arr[], int n);

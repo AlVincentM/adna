@@ -9,6 +9,7 @@
 int main(int argc, char * argv[]) {
 
 	array = (int*)malloc(sizeof(int));
+	temp_array = (int*)malloc(sizeof(int));
 
 	if (NULL == array) {
 		perror("Insufficient memory...\n");
@@ -42,22 +43,42 @@ int main(int argc, char * argv[]) {
 		// quit
 		if(strcmp(line, "quit\n") == 0) {
 			printf("Bye!\n");
+
+			// free all allocated memories
 			free(array);
+			free(temp_array);
 			free(line);
 			exit(1);
 		}
-		else
-			// printf("No of args: %d\n", arg_count);
-			// for (int i = 0; i < arg_count; ++i)
-			// {
-			// 	printf("%s\n", arg_vector[i]);
-			// }
+
+		// show variables
+		else if (strcmp(line, "show\n") == 0) {
+			printf("Array size N: %d\n", n);
+			printf("X: %d\n", x);
+			printf("Array: \n");
+			for (int i = 0; i < n; i++) {
+				printf("%d ", *(array + i));
+				if (n % 100 == 0) {
+					printf("\n");
+				}
+			}
+			printf("\n\n");
+		}
+
+		else {
+			// set variables
 			if(strcmp(arg_vector[0], "set") == 0) {
 				process_args(arg_count, arg_vector);
 				printf("N: %d  X: %d \n", n, x);
 			}
 
+			// sort the array
+			else if(strcmp(arg_vector[0], "sort") == 0) {
+				process_args(arg_count, arg_vector);
+			}
+
     		free(line);
+    	}
     }
 
     return 0;

@@ -98,71 +98,71 @@ void mergeSort(int left, int right) {
  * @param  a [description]
  * @param  b [description]
  */
-void swap(int * a, int * b){
+void swap(int *a, int *b){
     int temp = *a;
     *a = *b;
     *b = temp;
 }
 
-int partition(int arr[], int low, int high) {
-    int pivot = arr[high];
+int partition(int low, int high) {
+    int pivot = *(temp_array + high);
     int i = low - 1;
 
     for (int j = low; j <= high - 1; j++)
     {
-        if (arr[j] < pivot)
+        if (*(temp_array + j) < pivot)
         {
             i++;
-            swap(&arr[i], &arr[j]);
+            swap((temp_array + i), (temp_array + j));
         }
     }
-    swap(&arr[i + 1], &arr[high]);
+    swap((temp_array + (i + 1)), (temp_array + high));
     return (i + 1);
 }
 
-void quickSort(int arr[], int low, int high) {
+void quickSort(int low, int high) {
     if (low < high)
     {
-        int pi = partition(arr, low, high);
+        int pi = partition(low, high);
 
-        quickSort(arr, low, pi - 1);
-        quickSort(arr, pi + 1, high);
+        quickSort(low, pi - 1);
+        quickSort(pi + 1, high);
     }
 }
 
-void heapify(int arr[], int n, int i) {
+void heapify(int n, int i) {
     int largest = i;
     int left = 2 * i + 1;
     int right = 2 * i + 2;
 
-    if (left < n && arr[left] > arr[largest])
+    if (left < n && *(temp_array + left) > *(temp_array + largest))
     {
         largest = left;
     }
 
-    if (right < n && arr[right] > arr[largest])
+    if (right < n && *(temp_array + right) > *(temp_array + largest))
     {
         largest = right;
     }
 
     if (largest != i)
     {
-        swap(&arr[i], &arr[largest]);
+        swap((temp_array + i), (temp_array + largest));
 
-        heapify(arr, n, largest);
+        heapify(n, largest);
     }
 }
 
-void heapSort(int arr[], int n) {
+void heapSort() {
     for (int i = n / 2 - 1; i >= 0; i--)
     {
-        heapify(arr, n, i);
+        heapify(n, i);
     }
 
     for (int i = n - 1; i > 0; i--)
     {
-        swap(&arr[0], &arr[i]);
+        swap((temp_array), (temp_array + i));
 
-        heapify(arr, i, 0);
+        heapify(i, 0);
     }
 }

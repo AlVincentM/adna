@@ -1,10 +1,15 @@
 #ifndef UTIL_H
 
 #include <time.h>
+#include <stdio.h>
 
 #define UTIL_H
 #define MAX_RANGE 10000
 #define LENGTH(a) sizeof(a) / sizeof(a[0])
+
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_CYAN  "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 
 extern int x;
 extern int n;
@@ -12,6 +17,7 @@ extern int *array;
 extern int *temp_array;
 extern clock_t start, end;
 extern double cpu_time_used;
+extern FILE *file;
 
 
 #endif
@@ -38,3 +44,5 @@ extern void showArray(void);
 extern void copyArray(void);
 
 extern void sortingTime(int choice);
+
+extern void about();

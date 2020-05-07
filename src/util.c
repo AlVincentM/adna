@@ -14,6 +14,7 @@ int *array;
 int *temp_array;
 clock_t start, end;
 double cpu_time_used;
+FILE *file;
 
 /**
  * prints banner "Quarantine"
@@ -98,7 +99,6 @@ void process_args(int arg_c, char *arg_v[]) {
 
       switch(c) {
         case 'h': usage();
-                  exit(0);
                   break;
 
         case 'n': n = atoi(optarg);
@@ -110,18 +110,16 @@ void process_args(int arg_c, char *arg_v[]) {
                   // generates a random array
         case 'a': if (strcmp(optarg, "random") == 0 || strcmp(optarg, "random\n") == 0) {
                     generateArray('r');
-                    showArray();
                   }
 
                   // generates a sorted array
                   else if (strcmp(optarg, "sorted") == 0 || strcmp(optarg, "sorted\n") == 0) {
                     generateArray('s');
-                    showArray();
                   }
 
                   // print an error if provided other arguments
                   else {
-                    fprintf(stderr, "[ERROR]: Invalid argument for --array\n");
+                    fprintf(stderr, "\n[ERROR]: Invalid argument for --array\n\n");
                   }
                   break;
 
@@ -136,16 +134,19 @@ void process_args(int arg_c, char *arg_v[]) {
                   }
 
                   else if (strcmp(optarg, "quicksort") == 0 || strcmp(optarg, "quicksort\n") == 0) {
-                    // TODO: sort with quick sort
+                    copyArray();
+                    sortingTime(3);
                   }
 
                   else if (strcmp(optarg, "heapsort") == 0 || strcmp(optarg, "heapsort\n") == 0) {
-                    // TODO: sort with heap sort
+                    copyArray();
+                    sortingTime(4);
                   }
 
                   else {
                     fprintf(stderr,
-                            "[ERRO]: Unrecognized params for -s/--sort-using\n"
+                            "\n"
+                            "[ERROR]: Unrecognized params for -s/--sort-using\n"
                             "Use sort -h for help\n\n"
                             );
                   }
@@ -169,10 +170,25 @@ void process_args(int arg_c, char *arg_v[]) {
 void usage(void) {
     fprintf(stderr, 
         "Usage:\n"
-        "   SET [-n arraysize] [-x xsize] [-h]\n"
-        "       -h:     print help message\n"
-        "       -n:     array size N\n"
-        "       -x:     elements multiplier X\n"
+        "   COMMANDS:\n"
+        "   set [-n arraysize] [-x xsize] [-a random|sorted] [--array=random|sorted] [-h]\n\n"
+        "       -h                    print help message\n"
+        "       -n <number>           set array size N\n"
+        "       -x <number>           set multiplier X\n"
+        "       -a random|sorted      set array to either random or sorted\n"
+        "       --array=random|sorted                                     \n"
+        "\n"
+        "   sort [-s insertionsort|mergesort|quicksort|heapsort] [-h]\n\n"
+        "       -h                    print help message\n"
+        "       -s insertionsort|mergesort|quicksort|heapsort \n"
+        "       --sort-using=insertionsort|mergesort|quicksort|heapsort\n"
+        "                             sort the array using any of the given sorting algorithms\n"
+        "\n"
+        "   show                      show the values of N, X, and array elements\n"
+        "\n"
+        "   about                     prints the details about the program\n"
+        "\n"
+        "   quit                      quit the program\n"
         "\n"
     );
 }
@@ -190,18 +206,18 @@ void generateArray(char option) {
 
   // return if reallocation is unsuccessful
   if(NULL == array) {
-    fprintf(stderr, "[ERROR]: Array size not set or insufficient memory.\n");
+    fprintf(stderr, "[ERROR]: Array size not set or insufficient memory.\n\n");
     free(array);
     return;
   }
 
   // make array random if option is r
   if (option == 'r') {
-
+    srand(time(0));
     for (int i = 0; i < n; i++) {
       *(array + i) = rand() % MAX_RANGE + 1;
     }
-    printf("Array generated!\n");
+    printf("\nArray generated!\n");
   }
 
   // make array sorted if option is s
@@ -211,7 +227,7 @@ void generateArray(char option) {
       *(array + i) = n + (num * x);
       num++;
     }
-    printf("Array generated!\n");
+    printf("\nArray generated!\n");
   }
 }
 
@@ -250,6 +266,12 @@ void copyArray(void) {
 
 void sortingTime(int choice) {
 
+  FILE *file = fopen("OUTPUT.txt", "a");
+  time_t rawtime;
+  struct tm *timeinfo;
+  time(&rawtime);
+  timeinfo = localtime(&rawtime);
+
   switch(choice) {
 
             // get T(N) for insertion sort
@@ -257,15 +279,30 @@ void sortingTime(int choice) {
             insertionSort();
             end = clock();
             cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-            printf("\nBEFORE:\n");
-            showArray();
-            printf("\n");
-            printf("AFTER:\n");
+
+            // print to file
+            fprintf(file, 
+                    "[%02d-%02d-%02d %02d:%02d:%02d] Sorting array of %d elements...\n",
+                    timeinfo->tm_mon + 1, timeinfo->tm_mday, timeinfo->tm_year + 1900, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, n);
+            fprintf(file, "BEFORE:\n");
             for (int i = 0; i < n; i++) {
-              printf("%d ", *(temp_array + i));
+              fprintf(file, "%d ", *(array + i));
             }
-            printf("\n\n");
-            printf( "------------------------------------\n"
+            fprintf(file, "\n");
+            fprintf(file, "\nAFTER:\n");
+            for (int i = 0; i < n; i++) {
+              fprintf(file, "%d ", *(temp_array + i));
+            }
+            fprintf(file, "\n\n");
+            fprintf(file,
+                    "------------------------------------\n"
+                    "Insertion Sort took %f seconds\n"
+                    "------------------------------------\n\n"
+                    , cpu_time_used);
+
+            // print to screen
+            printf( "\n"
+                    "------------------------------------\n"
                     "Insertion Sort took %f seconds\n"
                     "------------------------------------\n\n"
                     , cpu_time_used);
@@ -276,19 +313,115 @@ void sortingTime(int choice) {
             mergeSort(0, n - 1);
             end = clock();
             cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-            printf("\nBEFORE:\n");
-            showArray();
-            printf("\n");
-            printf("AFTER:\n");
+
+            // print to file
+            fprintf(file, 
+                    "[%02d-%02d-%02d %02d:%02d:%02d] Sorting array of %d elements...\n",
+                    timeinfo->tm_mon + 1, timeinfo->tm_mday, timeinfo->tm_year + 1900, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, n);
+            fprintf(file, "BEFORE:\n");
             for (int i = 0; i < n; i++) {
-              printf("%d ", *(temp_array + i));
+              fprintf(file, "%d ", *(array + i));
             }
-            printf("\n\n");
-            printf( "--------------------------------\n"
+            fprintf(file, "\n");
+            fprintf(file, "\nAFTER:\n");
+            for (int i = 0; i < n; i++) {
+              fprintf(file, "%d ", *(temp_array + i));
+            }
+            fprintf(file, "\n\n");
+            fprintf(file,
+                    "--------------------------------\n"
+                    "Merge Sort took %f seconds\n"
+                    "--------------------------------\n\n"
+                    , cpu_time_used);
+
+            // print to screen
+            printf( "\n"
+                    "--------------------------------\n"
                     "Merge Sort took %f seconds\n"
                     "--------------------------------\n\n"
                     , cpu_time_used);
             break;
 
+    case 3: start = clock();
+            quickSort(0, n - 1);
+            end = clock();
+            cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            // print to file
+            fprintf(file, 
+                    "[%02d-%02d-%02d %02d:%02d:%02d] Sorting array of %d elements...\n",
+                    timeinfo->tm_mon + 1, timeinfo->tm_mday, timeinfo->tm_year + 1900, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, n);
+            fprintf(file, "BEFORE:\n");
+            for (int i = 0; i < n; i++) {
+              fprintf(file, "%d ", *(array + i));
+            }
+            fprintf(file, "\n");
+            fprintf(file, "\nAFTER:\n");
+            for (int i = 0; i < n; i++) {
+              fprintf(file, "%d ", *(temp_array + i));
+            }
+            fprintf(file, "\n\n");
+            fprintf(file,
+                    "--------------------------------\n"
+                    "Quick Sort took %f seconds\n"
+                    "--------------------------------\n\n"
+                    , cpu_time_used);
+
+            // print to screen
+            printf( "\n"
+                    "--------------------------------\n"
+                    "Quick Sort took %f seconds\n"
+                    "--------------------------------\n\n"
+                    , cpu_time_used);
+            break;
+
+    case 4: start = clock();
+            heapSort();
+            end = clock();
+            cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+            // print to file
+            fprintf(file, 
+                    "[%02d-%02d-%02d %02d:%02d:%02d] Sorting array of %d elements...\n",
+                    timeinfo->tm_mon + 1, timeinfo->tm_mday, timeinfo->tm_year + 1900, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, n);
+            fprintf(file, "BEFORE:\n");
+            for (int i = 0; i < n; i++) {
+              fprintf(file, "%d ", *(array + i));
+            }
+            fprintf(file, "\n");
+            fprintf(file, "\nAFTER:\n");
+            for (int i = 0; i < n; i++) {
+              fprintf(file, "%d ", *(temp_array + i));
+            }
+            fprintf(file, "\n\n");
+            fprintf(file,
+                    "-------------------------------\n"
+                    "Heap Sort took %f seconds\n"
+                    "-------------------------------\n\n"
+                    , cpu_time_used);
+
+            // print to screen
+            printf( "\n"
+                    "-------------------------------\n"
+                    "Heap Sort took %f seconds\n"
+                    "-------------------------------\n\n"
+                    , cpu_time_used);
+            break;
+
   }
+  
+  fclose(file);
+}
+
+void about() {
+  printf(
+          ANSI_COLOR_GREEN
+          "\n"
+          "+--------------------------------------------------------------------------------------------------+\n"
+          "| This program computes the sorting time of Insertion Sort, Merge Sort, Quick Sort, and Heap Sort. |\n"
+          "| Written by: Al Vincent Musa, BSCS-2B CS-111 Algorithm Design and Analysis                        |\n"
+          "+--------------------------------------------------------------------------------------------------+\n"
+          "\n"
+          ANSI_COLOR_RESET
+        );
 }

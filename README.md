@@ -4,7 +4,7 @@ To run the program go to bin folder where the application is located.
 ```bash
 adna
  |-- bin
- |	 |-- app
+ |	  |-- app
  |   `-- app.exe
  |-- src
  |   |-- main.c 

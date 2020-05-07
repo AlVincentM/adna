@@ -24,7 +24,7 @@ int main(int argc, char * argv[]) {
 		char *line = malloc(256 * sizeof(char));
 
 		// user input
-    	printf("Quarantine > ");
+    	printf(ANSI_COLOR_CYAN "Quarantine> " ANSI_COLOR_RESET);
     	fgets(line, 256, stdin);
 
     	// arg_v count
@@ -42,13 +42,20 @@ int main(int argc, char * argv[]) {
 
 		// quit
 		if(strcmp(line, "quit\n") == 0) {
-			printf("Bye!\n");
+			printf(ANSI_COLOR_GREEN "\nBye!\n\n" ANSI_COLOR_RESET);
 
 			// free all allocated memories
 			free(array);
 			free(temp_array);
 			free(line);
 			exit(1);
+		}
+		else if (strcmp(line, "help\n") == 0) {
+			usage();
+		}
+
+		else if(strcmp(line, "about\n") == 0) {
+			about();
 		}
 
 		// show variables
@@ -58,18 +65,19 @@ int main(int argc, char * argv[]) {
 			printf("Array: \n");
 			for (int i = 0; i < n; i++) {
 				printf("%d ", *(array + i));
-				if (n % 100 == 0) {
-					printf("\n");
-				}
 			}
 			printf("\n\n");
+		}
+
+		else if (strcmp(line, "about\n") == 0) {
+
 		}
 
 		else {
 			// set variables
 			if(strcmp(arg_vector[0], "set") == 0) {
 				process_args(arg_count, arg_vector);
-				printf("N: %d  X: %d \n", n, x);
+				printf("N: %d  X: %d \n\n", n, x);
 			}
 
 			// sort the array
